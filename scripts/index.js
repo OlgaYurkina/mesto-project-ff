@@ -1,42 +1,37 @@
 // Функция для создания элемента карточки
-function createCardElement({ name, link }) {
+function createCardElement({ name, link }, handleDeleteCard) {
     const cardTemplate = document.querySelector('#card-template').content;
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true); // Клонируем карточку
     const cardImage = cardElement.querySelector('.card__image');
     const cardTitle = cardElement.querySelector('.card__title');
     const deleteButton = cardElement.querySelector('.card__delete-button');
-    const likeButton = cardElement.querySelector('.card__like-button');
-  
+
     // Устанавливаем данные для карточки
     cardImage.src = link;
     cardImage.alt = name;
     cardTitle.textContent = name;
-  
+
     // Добавление обработчика на удаление карточки
     deleteButton.addEventListener('click', () => {
-      cardElement.remove(); // Удаление карточки из DOM
+      handleDeleteCard(cardElement);
     });
-  
-    // Добавление обработчика на лайк
-    likeButton.addEventListener('click', () => {
-      if (likeButton.classList.contains('card__like-button_is-active')) {
-        likeButton.classList.remove('card__like-button_is-active');
-      } else {
-        likeButton.classList.add('card__like-button_is-active');
-      }
-    });
+
     return cardElement;
-  }
-  
-  // Функция для отображения всех карточек
-  function renderCards() {
+}
+
+// Функция для удаления карточки
+function handleDeleteCard(cardElement) {
+    cardElement.remove(); // Удаление карточки из DOM
+}
+
+// Функция для отображения всех карточек
+function renderCards() {
     const placesList = document.querySelector('.places__list');
     initialCards.forEach((cardData) => {
-      const cardElement = createCardElement(cardData);
-      placesList.append(cardElement); // Добавляем карточки на страницу
+        const cardElement = createCardElement(cardData, handleDeleteCard);
+        placesList.append(cardElement); // Добавляем карточки на страницу
     });
-  }
-  
-  // Отобразить все карточки при загрузке страницы
-  renderCards();
-  
+}
+
+// Отобразить все карточки при загрузке страницы
+renderCards();
