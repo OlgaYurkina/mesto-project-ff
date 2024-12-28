@@ -8,9 +8,9 @@ const placesList = document.querySelector('.places__list');
 const addCardButton = document.querySelector('.profile__add-button');
 const newCardPopup = document.querySelector('.popup_type_new-card');
 const closePopupButton = newCardPopup.querySelector('.popup__close');
-const form = newCardPopup.querySelector('form');
-const placeNameInput = form.querySelector('input[name="place-name"]');
-const linkInput = form.querySelector('input[name="link"]');
+const newCardForm = newCardPopup.querySelector('form'); //поменяла имя переменной на уникальное
+const placeNameInput = newCardForm.querySelector('input[name="place-name"]');
+const linkInput = newCardForm.querySelector('input[name="link"]');
 const editProfileButton = document.querySelector('.profile__edit-button');
 const editProfilePopup = document.querySelector('.popup_type_edit');
 const editProfileForm = editProfilePopup.querySelector('form');
@@ -42,7 +42,7 @@ function handleImageClick(name, link) {
 }
 
 // Добавление новой карточки
-form.addEventListener('submit', (event) => {
+newCardForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
     const newCard = {
@@ -54,7 +54,7 @@ form.addEventListener('submit', (event) => {
     placesList.prepend(cardElement);
 
     closeModal(newCardPopup);
-    form.reset();
+    newCardForm.reset();
 });
 
 // Открытие попапа добавления карточки
@@ -93,16 +93,6 @@ document.querySelectorAll('.popup').forEach((popup) => {
             closeModal(popup);
         }
     });
-});
-
-// Закрытие попапа при нажатии на Escape
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        const openedPopup = document.querySelector('.popup_is-opened');
-        if (openedPopup) {
-            closeModal(openedPopup);
-        }
-    }
 });
 
 // Отобразить карточки при загрузке страницы
