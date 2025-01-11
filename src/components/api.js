@@ -78,7 +78,7 @@ export const updateAvatar = (avatarUrl) => {
 };
 
 // Функция для обновления лайков
-export function updateLike(cardId, isLiked) {
+export function updateLike(cardId, isLiked) { 
   const method = isLiked ? 'PUT' : 'DELETE';
 
   return fetch(`${BASE_URL}cards/${cardId}/likes`, {
@@ -92,4 +92,7 @@ export function updateLike(cardId, isLiked) {
     }
     throw new Error('Ошибка при обновлении лайков');
   })
+  .catch((err) => {
+    console.error('Ошибка при запросе к серверу:', err);
+  });
 }

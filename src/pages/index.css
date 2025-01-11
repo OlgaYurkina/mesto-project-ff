@@ -79,3 +79,47 @@
 .card__delete-button_hidden {
     display: none;
 }
+
+.profile__image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    margin: 0 29px 0 0;
+    position: relative;
+}
+
+.profile__image::before {
+    position: absolute;
+    content: "";
+    block-size: 100%;
+    inline-size: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    z-index: 1;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.profile__image:hover::before {
+    opacity: 0;
+}
+
+.profile__avatar-edit-button {
+    position: absolute; /* Позволяет кнопке располагаться относительно родителя */
+    top: 50%; /* Позиционируем кнопку по вертикали */
+    left: 50%; /* Позиционируем кнопку по горизонтали */
+    transform: translate(-50%, -50%); /* Центрируем кнопку по обеим осям */
+    background: rgba(255, 255, 255, 0); /* Пример фона с прозрачностью */
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 2; /* Делаем кнопку поверх изображения */
+    transition: background 0.3s ease;
+}
+
+.profile__avatar-edit-button:hover {
+}

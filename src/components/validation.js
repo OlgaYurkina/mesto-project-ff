@@ -23,21 +23,10 @@ function checkInputValidity(inputElement, settings) {
     }
 }
 
-// Функция для проверки действительности URL
-function validateImageUrl(url) {
-    return fetch(url, { method: 'HEAD' })
-      .then((res) => {
-        if (!res.ok || !res.headers.get('Content-Type').includes('image/')) {
-          throw new Error('Неверный URL или не изображение');
-        }
-      })
-      .catch((err) => console.error(err));
-  }  
-
 // Функция для проверки поля на соответствие паттерну
 function checkPatternValidity(inputElement, settings) {
     const pattern = inputElement.pattern;
-    const errorMessage = "Неверный формат. Пожалуйста, следуйте заданным правилам.";
+    const errorMessage = inputElement.dataset.errorMessage || "Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы.";
 
     if (pattern && !new RegExp(pattern).test(inputElement.value)) {
         inputElement.setCustomValidity(errorMessage);
