@@ -1,69 +1,47 @@
-import likeActive from '../images/like-active.svg';
-import likeInactive from '../images/like-inactive.svg';
 import { closeModal } from './modal.js';
-import { deleteCard } from './api.js';
+import { updateLike, deleteCard } from './api.js';
 
 // Обработчик лайков
-export function handleLikeButtonClick(likeButton, likeCountElement, cardData, userId) {
+export function handleLikeButtonClick(likeButton, likeCountElement, cardData) {
     const isActive = likeButton.classList.toggle('card__like-button_is-active');
-    likeButton.style.backgroundImage = isActive
-        ? `url(${likeActive})`
-        : `url(${likeInactive})`;
 
-    // Обновляем массив лайков и отображение их количества
-    if (isActive) {
-        cardData.likes.push({ _id: userId });
-    } else {
-        cardData.likes = cardData.likes.filter((user) => user._id !== userId);
-    }
-
-    likeCountElement.textContent = cardData.likes.length;
+    // Отправляем запрос на сервер для обновления лайка
+    updateLike(cardData._id, isActive)
+    .then((updatedCardData) => {
+        // Обновляем количество лайков на основе ответа с сервера
+        cardData.likes = updatedCardData; 
+        likeCountElement.textContent = updatedCardData.length;
+    })
+    .catch((err) => console.error('Ошибка при обновлении лайков:', err));
 }
 
-// Обработчик открытия попапа для подтверждения удаления
+// Функция для открытия попапа для подтверждения удаления
 export function openDeleteConfirmationPopup(cardElement, cardId) {
     const confirmationPopup = document.querySelector('.popup_type_confirm-delete');
     const confirmButton = confirmationPopup.querySelector('.popup__confirm-button');
-    const cancelButton = confirmationPopup.querySelector('.popup__cancel-button');
-
+    
     confirmationPopup.classList.add('popup_is-opened');
 
-    // Подтверждение удаления карточки
-    confirmButton.addEventListener('click', () => {
+    // Удаляем старый обработчик, если он существует
+    confirmButton.removeEventListener('click', handleConfirmButtonClick);
+
+    // Добавляем новый обработчик с флагом once
+    confirmButton.addEventListener('click', handleConfirmButtonClick, { once: true });
+
+    // Функция для подтверждения удаления карточки
+    function handleConfirmButtonClick() {
         // Удаляем карточку с сервера
         deleteCard(cardId)
         .then(() => {
             cardElement.remove();  // Удаляем карточку с UI
         })
         .catch((err) => console.error(`openDeleteConfirmationPopup: Ошибка ${err} удаления карточки ${cardId}`))
-        .finally(()=> closeModal(confirmationPopup)); // Ошибка-не ошибка, закрываем попап)        
-    });
-
-    // Закрытие попапа без удаления
-    cancelButton.addEventListener('click', () => closeModal(confirmationPopup));
+        .finally(() => closeModal(confirmationPopup)); // Ошибка-не ошибка, закрываем попап
+    }
 }
 
-// ТОЖЕ НЕ К МЕСТУ ТУТ 
-//
-// Удаление карточки с сервера
-// function deleteCardFromServer(cardId) {
-//     fetch(`https://nomoreparties.co/v1/cohortId/cards/${cardId}`, {
-//         method: 'DELETE',
-//         headers: {
-//             'Authorization': `Bearer ${localStorage.getItem('token')}`,
-//         },
-//     })
-//         .then(response => response.json())
-//         .then(data => {
-//             if (data.message) {
-//                 console.log("Карточка удалена:", data);
-//             }
-//         })
-//         .catch(error => console.log("Ошибка при удалении карточки:", error));
-// }
-
 // Функция создания карточки
-export function createCard({ _id, name, link, likes, owner }, handleImageClick, userId, deleteCard) {
+export function createCard({ _id, name, link, likes, owner }, handleImageClick, userId) {
     const cardTemplate = document.querySelector('#card-template').content;
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     const cardImage = cardElement.querySelector('.card__image');
@@ -78,9 +56,11 @@ export function createCard({ _id, name, link, likes, owner }, handleImageClick, 
     cardTitle.textContent = name;
 
     // Устанавливаем начальное состояние кнопки лайка и количество лайков
-    likeButton.style.backgroundImage = likes.some((user) => user._id === userId)
-        ? `url(${likeActive})`
-        : `url(${likeInactive})`;
+    if (likes.some((user) => user._id === userId)) {
+        likeButton.classList.add('card__like-button_is-active');
+    } else {
+        likeButton.classList.remove('card__like-button_is-active');
+    }
     likeCountElement.textContent = likes.length;
 
     // Скрываем или показываем кнопку удаления, если карточка принадлежит текущему пользователю
@@ -92,7 +72,7 @@ export function createCard({ _id, name, link, likes, owner }, handleImageClick, 
     }
 
     // Добавляем обработчики
-    likeButton.addEventListener('click', () => handleLikeButtonClick(likeButton, likeCountElement, { name, link, likes }, userId));
+    likeButton.addEventListener('click', () => handleLikeButtonClick(likeButton, likeCountElement, { _id, likes }, userId));
     cardImage.addEventListener('click', () => handleImageClick(name, link));
 
     return cardElement;

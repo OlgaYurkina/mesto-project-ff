@@ -34,13 +34,12 @@ function validateImageUrl(url) {
       .catch((err) => console.error(err));
   }  
 
-// Функция для проверки поля "Имя" или "Название" на соответствие правилам
-function checkCustomValidity(inputElement, settings) {
-    const value = inputElement.value.trim();
-    const pattern = /^[a-zA-Zа-яА-ЯёЁ\s-]+$/; // Разрешены только латинские, кириллические буквы, пробелы и дефисы
-    const errorMessage = "Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы";
+// Функция для проверки поля на соответствие паттерну
+function checkPatternValidity(inputElement, settings) {
+    const pattern = inputElement.pattern;
+    const errorMessage = "Неверный формат. Пожалуйста, следуйте заданным правилам.";
 
-    if (value && !pattern.test(value)) {
+    if (pattern && !new RegExp(pattern).test(inputElement.value)) {
         inputElement.setCustomValidity(errorMessage);
         showInputError(inputElement, errorMessage, settings);
     } else {
@@ -60,8 +59,8 @@ function enableValidation(settings) {
         // Проверка всех инпутов
         inputs.forEach((inputElement) => {
             inputElement.addEventListener('input', () => {
-                if (inputElement.name === 'place-name' || inputElement.name === 'name') {
-                    checkCustomValidity(inputElement, settings);  // Валидация для полей с кастомным сообщением
+                if (inputElement.pattern) {
+                    checkPatternValidity(inputElement, settings);  // Валидация с использованием pattern
                 } else {
                     checkInputValidity(inputElement, settings);  // Стандартная валидация
                 }

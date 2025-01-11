@@ -38,8 +38,7 @@ let currentCardId = null; // Для хранения ID карточки, кот
 // Функция для отображения всех карточек
 function renderCards(cards) {
     cards.forEach((cardData) => {
-        const isOwner = cardData.owner._id === userId; // Проверяем, является ли текущий пользователь владельцем карточки
-        const cardElement = createCard(cardData, handleImageClick, userId, isOwner, deleteCard);
+        const cardElement = createCard(cardData, handleImageClick, userId);
         placesList.append(cardElement);
     });
 }
@@ -156,27 +155,6 @@ export function handleDeleteCard(cardElement, cardId) {
 // Подтверждение удаления карточки
 const confirmButton = confirmationPopup.querySelector('.popup__confirm-button');
 const cancelButton = confirmationPopup.querySelector('.popup__cancel-button');
-
-// КОД ИЗ ДРУГОЙ ВСЕЛЕННОЙ
-//
-// Удаление карточки с сервера
-// function deleteCardFromServer() {
-//     fetch(`https://nomoreparties.co/v1/${userId}/cards/${currentCardId}`, {
-//         method: 'DELETE',
-//         headers: {
-//             'Authorization': `Bearer ${localStorage.getItem('token')}`,
-//         },
-//     })
-//         .then(response => response.json())
-//         .then(data => {
-//             if (data.message) {
-//                 console.log("Карточка удалена:", data);
-//                 document.getElementById(currentCardId).remove(); // Удаляем карточку из DOM
-//                 closeModal(confirmationPopup); // Закрываем попап
-//             }
-//         })
-//         .catch(error => console.log("Ошибка при удалении карточки:", error));
-// }
 
 // Закрытие попапа подтверждения удаления карточки
 cancelButton.addEventListener('click', () => closeModal(confirmationPopup));  // Закрываем попап без удаления

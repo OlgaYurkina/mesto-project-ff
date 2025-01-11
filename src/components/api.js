@@ -23,9 +23,6 @@ export const getUserData = () => {
     headers: config.headers,
   })
     .then(handleResponse)
-    .catch((err) => {
-      console.error(err);
-    });
 };
 
 // Функция для обновления данных пользователя
@@ -39,9 +36,6 @@ export const updateUserData = (name, about) => {
     }),
   })
     .then(handleResponse)
-    .catch((err) => {
-      console.error(err);
-    });
 };
 
 // Функция для получения карточек
@@ -50,9 +44,6 @@ export const getCards = () => {
     headers: config.headers,
   })
     .then(handleResponse)
-    .catch((err) => {
-      console.error(err);
-    });
 };
 
 // Функция для добавления новой карточки
@@ -63,9 +54,6 @@ export const addCard = (cardData) => {
     body: JSON.stringify(cardData),
   })
     .then(handleResponse)
-    .catch((err) => {
-      console.error(err);
-    });
 };
 
 // Функция для удаления карточки
@@ -75,9 +63,6 @@ export const deleteCard = (cardId) => {
     headers: config.headers,
   })
     .then(handleResponse)
-    .catch((err) => {
-      console.error(err);
-    });
 };
 
 // Функция для изменения аватара
@@ -90,7 +75,21 @@ export const updateAvatar = (avatarUrl) => {
     }),
   })
     .then(handleResponse)
-    .catch((err) => {
-      console.error(err);
-    });
 };
+
+// Функция для обновления лайков
+export function updateLike(cardId, isLiked) {
+  const method = isLiked ? 'PUT' : 'DELETE';
+
+  return fetch(`${BASE_URL}cards/${cardId}/likes`, {
+    method: method,
+    headers: config.headers,
+  })
+  .then((response) => handleResponse(response)) // обработка ответа
+  .then((data) => {
+    if (data.likes) {
+      return data.likes; // возвращаем обновленный список лайков
+    }
+    throw new Error('Ошибка при обновлении лайков');
+  })
+}
