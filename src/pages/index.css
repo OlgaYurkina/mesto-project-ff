@@ -12,12 +12,23 @@
 @import url('../blocks/popup/_is-opened/popup_is-opened.css');
 
 /* Стили для текста ошибки */
+/*
 .popup__input-error {
     font-size: 12px;
     color: red;
     margin-top: 5px;
     display: block;
-    height: 16px; /* Чтобы форма не "прыгала" при добавлении текста */
+    height: 16px; }/* Чтобы форма не "прыгала" при добавлении текста */
+
+.popup__input-error {
+color: red;
+display: block;
+font-family: inherit;
+font-size: 12px;
+inset-block-start: calc(100% + 5px);
+inset-inline-start: 0;
+line-height: 1;
+position: absolute;
 }
 
 /* Стили для поля с ошибкой */
@@ -36,6 +47,13 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
+.popup__label {
+    display: block;
+    position: relative;
+    padding-block-start: 15px;
+    margin-block-end: 15px;
+  }
 
 .popup__button:disabled {
     background-color: #d3d3d3; /* Цвет неактивной кнопки */
