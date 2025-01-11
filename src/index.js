@@ -39,7 +39,7 @@ let currentCardId = null; // Для хранения ID карточки, кот
 function renderCards(cards) {
     cards.forEach((cardData) => {
         const isOwner = cardData.owner._id === userId; // Проверяем, является ли текущий пользователь владельцем карточки
-        const cardElement = createCard(cardData, handleImageClick, userId, isOwner);
+        const cardElement = createCard(cardData, handleImageClick, userId, isOwner, deleteCard);
         placesList.append(cardElement);
     });
 }
@@ -57,6 +57,7 @@ function loadData() {
     Promise.all([getUserData(), getCards()])
         .then(([userData, cards]) => {
             userId = userData._id;  // Получаем id пользователя
+            setUserProfile(userData.name, userData.about)
             renderCards(cards); // Отображаем карточки
         })
         .catch((err) => console.log('Ошибка при загрузке данных:', err));
@@ -90,8 +91,7 @@ editProfileForm.addEventListener('submit', (event) => {
     
     updateUserData(name, about)
         .then((updatedUserData) => {
-            profileName.textContent = updatedUserData.name;
-            profileDescription.textContent = updatedUserData.about;
+            setUserProfile(updatedUserData.name, updatedUserData.about);
             closeModal(editProfilePopup);
         })
         .catch((err) => console.log('Ошибка при обновлении данных пользователя:', err))
@@ -157,27 +157,28 @@ export function handleDeleteCard(cardElement, cardId) {
 const confirmButton = confirmationPopup.querySelector('.popup__confirm-button');
 const cancelButton = confirmationPopup.querySelector('.popup__cancel-button');
 
+// КОД ИЗ ДРУГОЙ ВСЕЛЕННОЙ
+//
 // Удаление карточки с сервера
-function deleteCardFromServer() {
-    fetch(`https://nomoreparties.co/v1/${userId}/cards/${currentCardId}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                console.log("Карточка удалена:", data);
-                document.getElementById(currentCardId).remove(); // Удаляем карточку из DOM
-                closeModal(confirmationPopup); // Закрываем попап
-            }
-        })
-        .catch(error => console.log("Ошибка при удалении карточки:", error));
-}
+// function deleteCardFromServer() {
+//     fetch(`https://nomoreparties.co/v1/${userId}/cards/${currentCardId}`, {
+//         method: 'DELETE',
+//         headers: {
+//             'Authorization': `Bearer ${localStorage.getItem('token')}`,
+//         },
+//     })
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.message) {
+//                 console.log("Карточка удалена:", data);
+//                 document.getElementById(currentCardId).remove(); // Удаляем карточку из DOM
+//                 closeModal(confirmationPopup); // Закрываем попап
+//             }
+//         })
+//         .catch(error => console.log("Ошибка при удалении карточки:", error));
+// }
 
-// Обработчики кнопок подтверждения и отмены
-confirmButton.addEventListener('click', deleteCardFromServer);  // Удаляем карточку при подтверждении
+// Закрытие попапа подтверждения удаления карточки
 cancelButton.addEventListener('click', () => closeModal(confirmationPopup));  // Закрываем попап без удаления
 
 // Открытие попапа редактирования аватара
@@ -220,3 +221,8 @@ avatarPopup.querySelector('.popup__form').addEventListener('submit', (event) => 
 
 // Загрузка данных при старте страницы
 loadData();
+
+function setUserProfile(userName, userAbout) {
+    profileName.textContent = userName;
+    profileDescription.textContent = userAbout;
+}

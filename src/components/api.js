@@ -9,17 +9,20 @@ const config = {
   },
 };
 
+// Общая функция для обработки ответа
+const handleResponse = (res) => {
+  if (res.ok) {
+    return res.json();
+  }
+  return Promise.reject(`Ошибка: ${res.status}`);
+};
+
 // Функция для получения данных пользователя
 export const getUserData = () => {
   return fetch(`${BASE_URL}users/me`, {
     headers: config.headers,
   })
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject(`Ошибка при получении данных пользователя: ${res.status}`);
-    })
+    .then(handleResponse)
     .catch((err) => {
       console.error(err);
     });
@@ -35,12 +38,7 @@ export const updateUserData = (name, about) => {
       about,
     }),
   })
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject(`Ошибка при обновлении данных пользователя: ${res.status}`);
-    })
+    .then(handleResponse)
     .catch((err) => {
       console.error(err);
     });
@@ -51,12 +49,7 @@ export const getCards = () => {
   return fetch(`${BASE_URL}cards`, {
     headers: config.headers,
   })
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject(`Ошибка при получении карточек: ${res.status}`);
-    })
+    .then(handleResponse)
     .catch((err) => {
       console.error(err);
     });
@@ -67,14 +60,9 @@ export const addCard = (cardData) => {
   return fetch(`${BASE_URL}cards`, {
     method: 'POST',
     headers: config.headers,
-    body: JSON.stringify(cardData), // Отправляем данные карточки в формате JSON
+    body: JSON.stringify(cardData),
   })
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject(`Ошибка при добавлении карточки: ${res.status}`);
-    })
+    .then(handleResponse)
     .catch((err) => {
       console.error(err);
     });
@@ -86,12 +74,7 @@ export const deleteCard = (cardId) => {
     method: 'DELETE',
     headers: config.headers,
   })
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject(`Ошибка при удалении карточки: ${res.status}`);
-    })
+    .then(handleResponse)
     .catch((err) => {
       console.error(err);
     });
@@ -101,20 +84,12 @@ export const deleteCard = (cardId) => {
 export const updateAvatar = (avatarUrl) => {
   return fetch(`${BASE_URL}users/me/avatar`, {
     method: 'PATCH',
-    headers: {
-      'Authorization': `Bearer ${TOKEN}`,
-      'Content-Type': 'application/json',
-    },
+    headers: config.headers,
     body: JSON.stringify({
       avatar: avatarUrl,
     }),
   })
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject(`Ошибка при обновлении аватара: ${res.status}`);
-    })
+    .then(handleResponse)
     .catch((err) => {
       console.error(err);
     });

@@ -1,6 +1,7 @@
 import likeActive from '../images/like-active.svg';
 import likeInactive from '../images/like-inactive.svg';
-import { closeModal } from './modal.js'; 
+import { closeModal } from './modal.js';
+import { deleteCard } from './api.js';
 
 // Обработчик лайков
 export function handleLikeButtonClick(likeButton, likeCountElement, cardData, userId) {
@@ -29,34 +30,40 @@ export function openDeleteConfirmationPopup(cardElement, cardId) {
 
     // Подтверждение удаления карточки
     confirmButton.addEventListener('click', () => {
-        deleteCardFromServer(cardId);  // Удаляем карточку с сервера
-        cardElement.remove();  // Удаляем карточку с UI
-        closeModal(confirmationPopup);  // Закрываем попап
+        // Удаляем карточку с сервера
+        deleteCard(cardId)
+        .then(() => {
+            cardElement.remove();  // Удаляем карточку с UI
+        })
+        .catch((err) => console.error(`openDeleteConfirmationPopup: Ошибка ${err} удаления карточки ${cardId}`))
+        .finally(()=> closeModal(confirmationPopup)); // Ошибка-не ошибка, закрываем попап)        
     });
 
     // Закрытие попапа без удаления
     cancelButton.addEventListener('click', () => closeModal(confirmationPopup));
 }
 
+// ТОЖЕ НЕ К МЕСТУ ТУТ 
+//
 // Удаление карточки с сервера
-function deleteCardFromServer(cardId) {
-    fetch(`https://nomoreparties.co/v1/cohortId/cards/${cardId}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                console.log("Карточка удалена:", data);
-            }
-        })
-        .catch(error => console.log("Ошибка при удалении карточки:", error));
-}
+// function deleteCardFromServer(cardId) {
+//     fetch(`https://nomoreparties.co/v1/cohortId/cards/${cardId}`, {
+//         method: 'DELETE',
+//         headers: {
+//             'Authorization': `Bearer ${localStorage.getItem('token')}`,
+//         },
+//     })
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.message) {
+//                 console.log("Карточка удалена:", data);
+//             }
+//         })
+//         .catch(error => console.log("Ошибка при удалении карточки:", error));
+// }
 
 // Функция создания карточки
-export function createCard({ _id, name, link, likes, owner }, handleImageClick, userId) {
+export function createCard({ _id, name, link, likes, owner }, handleImageClick, userId, deleteCard) {
     const cardTemplate = document.querySelector('#card-template').content;
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     const cardImage = cardElement.querySelector('.card__image');
