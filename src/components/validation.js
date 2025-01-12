@@ -16,51 +16,47 @@ function hideInputError(inputElement, settings) {
 
 // Функция, которая проверяет валидность поля
 function checkInputValidity(inputElement, settings) {
+    // Если поле не подходит под pattern
+    if (inputElement.validity.patternMismatch) {
+      // Берём текст ошибки либо из data-атрибута, либо ставим свою фразу
+      const errorMessage =
+        inputElement.dataset.errorMessage ||
+        'Разрешены только латинские/кириллические буквы, знаки дефиса и пробелы.';
+      inputElement.setCustomValidity(errorMessage);
+    } else {
+      // Сбрасываем кастомную ошибку, если всё ок
+      inputElement.setCustomValidity('');
+    }
+  
+    // Дальше стандартная логика показа/сокрытия ошибки
     if (!inputElement.validity.valid) {
-        showInputError(inputElement, inputElement.validationMessage, settings);
+      showInputError(inputElement, inputElement.validationMessage, settings);
     } else {
-        hideInputError(inputElement, settings);
+      hideInputError(inputElement, settings);
     }
-}
-
-// Функция для проверки поля на соответствие паттерну
-function checkPatternValidity(inputElement, settings) {
-    const pattern = inputElement.pattern;
-    const errorMessage = inputElement.dataset.errorMessage || "Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы.";
-
-    if (pattern && !new RegExp(pattern).test(inputElement.value)) {
-        inputElement.setCustomValidity(errorMessage);
-        showInputError(inputElement, errorMessage, settings);
-    } else {
-        inputElement.setCustomValidity('');
-        checkInputValidity(inputElement, settings);
-    }
-}
+  }
 
 // Функция для включения валидации на всей странице
 function enableValidation(settings) {
     const forms = Array.from(document.querySelectorAll(settings.formSelector));
     forms.forEach((form) => {
-        form.addEventListener('submit', (evt) => evt.preventDefault());
-        const inputs = Array.from(form.querySelectorAll(settings.inputSelector));
-        const button = form.querySelector(settings.submitButtonSelector);
-        
-        // Проверка всех инпутов
-        inputs.forEach((inputElement) => {
-            inputElement.addEventListener('input', () => {
-                if (inputElement.pattern) {
-                    checkPatternValidity(inputElement, settings);  // Валидация с использованием pattern
-                } else {
-                    checkInputValidity(inputElement, settings);  // Стандартная валидация
-                }
-                toggleButtonState(inputs, button, settings);
-            });
+      form.addEventListener('submit', (evt) => evt.preventDefault());
+  
+      const inputs = Array.from(form.querySelectorAll(settings.inputSelector));
+      const button = form.querySelector(settings.submitButtonSelector);
+  
+      // Навешиваем обработчики на все поля
+      inputs.forEach((inputElement) => {
+        inputElement.addEventListener('input', () => {
+          checkInputValidity(inputElement, settings);
+          toggleButtonState(inputs, button, settings);
         });
-
-        // Изначально проверяем состояние кнопки
-        toggleButtonState(inputs, button, settings);
+      });
+  
+      // Изначальная проверка кнопки
+      toggleButtonState(inputs, button, settings);
     });
-}
+  }
 
 // Функция для активации или деактивации кнопки в зависимости от валидности формы
 function toggleButtonState(inputs, button, settings) {

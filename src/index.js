@@ -1,5 +1,5 @@
 import './pages/index.css';
-import { getUserData, getCards, updateUserData, addCard, deleteCard, updateAvatar } from './components/api.js'; // Импорт функций API
+import { getUserData, getCards, updateUserData, addCard, deleteCard, updateAvatar, updateLike } from './components/api.js'; // Импорт функций API
 import { createCard } from './components/card.js'; // Импорт функции создания карточек
 import { openModal, closeModal } from './components/modal.js'; // Импорт функций для работы с попапами
 import { clearValidation, enableValidation } from './components/validation.js'; // Импорт функции валидации
@@ -61,7 +61,8 @@ const validationConfig = {
         cardData, 
         handleImageClick,
         userId,
-        handleDeleteClick   
+        handleDeleteClick,
+        handleLikeClick
       );
       placesList.append(cardElement);
     });
@@ -166,7 +167,7 @@ newCardForm.addEventListener('submit', (event) => {
     
     addCard({ name, link })
         .then((newCard) => {
-            const cardElement = createCard(newCard, handleImageClick, userId, handleDeleteClick);
+            const cardElement = createCard(newCard, handleImageClick, userId, handleDeleteClick, handleLikeClick);
             placesList.prepend(cardElement);  // Добавляем карточку в начало списка
             closeModal(newCardPopup); // Закрываем попап
             newCardForm.reset(); // Очищаем форму
@@ -227,8 +228,27 @@ avatarPopup.querySelector('.popup__form').addEventListener('submit', (event) => 
     });
 });
 
+// Обновление лайков
+function handleLikeClick(cardData, likeButton, likeCountElement) {
+  // Проверяем, активен ли лайк сейчас
+  const isLiked = likeButton.classList.contains('card__like-button_is-active');
 
+  updateLike(cardData._id, !isLiked)
+    .then((updatedLikes) => {
+      
+      cardData.likes = updatedLikes;
 
+      if (!isLiked) {
+        likeButton.classList.add('card__like-button_is-active');
+      } else {
+        likeButton.classList.remove('card__like-button_is-active');
+      }
+
+      // Обновляем счётчик
+      likeCountElement.textContent = updatedLikes.length;
+    })
+    .catch((err) => console.error('Ошибка при обновлении лайков:', err));
+}
 
 // Загрузка данных при старте страницы
 loadData();

@@ -92,7 +92,4 @@ export function updateLike(cardId, isLiked) {
     }
     throw new Error('Ошибка при обновлении лайков');
   })
-  .catch((err) => {
-    console.error('Ошибка при запросе к серверу:', err);
-  });
 }
