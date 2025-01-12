@@ -18,7 +18,6 @@ function hideInputError(inputElement, settings) {
 function checkInputValidity(inputElement, settings) {
     // Если поле не подходит под pattern
     if (inputElement.validity.patternMismatch) {
-      // Берём текст ошибки либо из data-атрибута, либо ставим свою фразу
       const errorMessage =
         inputElement.dataset.errorMessage ||
         'Разрешены только латинские/кириллические буквы, знаки дефиса и пробелы.';
